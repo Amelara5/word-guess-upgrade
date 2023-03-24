@@ -1,21 +1,31 @@
 import { useEffect, useState } from "react";
 
+const WORD = "bird";
+
 function App() {
   const [user, setUser] = useState("");
   const [route, setRoute] = useState(false);
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(0);
+
+  const [wordTest, setWordTest] = useState(["_", "_", "_", "_"]);
 
   useEffect(() => {
-    if (timer > 0 && route) {
+    const splitWord = WORD.split("");
+
+    if (route && !(splitWord.toString() === wordTest.toString())) {
       const intervalId = setInterval(() => {
         setTimer((prev) => prev + 1);
       }, 500);
+
+      if (splitWord.toString() === wordTest.toString()) {
+        console.log("Game finished");
+      }
 
       return () => {
         clearInterval(intervalId);
       };
     }
-  }, [timer, route]);
+  }, [timer, route, wordTest]);
 
   return (
     <div className="flex h-screen flex-col items-center justify-center">
@@ -33,12 +43,6 @@ function App() {
           console.log(e.target.value);
           setUser(e.target.value);
         }}
-        onChange={(e) => {
-          const letter = e.target.value;
-          if (letter !== "t") {
-            setTimer((prev) => prev + 10);
-          }
-        }}
       />
       <button
         className=" my-6 rounded-md bg-yellow-200 p-2"
@@ -49,8 +53,47 @@ function App() {
       >
         Start
       </button>
+
+      <div className="text-4xl font-black">Player: {user}</div>
+      <div className="text-8xl font-extrabold uppercase tracking-widest">
+        {wordTest}
+      </div>
+      <div className=" my-10">
+        <label htmlFor="guess">Guess a letter:</label>
+        <input
+          type="text"
+          className="ml-1 w-8 rounded-md border-2 border-gray-300"
+          maxLength={1}
+          id="guess"
+          onInput={(e) => {
+            const letter = e.target.value;
+            const splitWord = WORD.split("");
+
+            if (splitWord.includes(letter)) {
+              for (let i = 0; i < WORD.length; i++) {
+                if (splitWord[i] === letter) {
+                  setWordTest((prev) => {
+                    const newValue = [...prev];
+                    newValue.splice(i, 1, letter);
+                    return newValue;
+                  });
+                }
+              }
+            } else {
+              setTimer((prev) => prev + 10);
+            }
+            e.target.value = "";
+          }}
+        />
+      </div>
+
       <div>{timer}</div>
-      {route ? <div>GAME PAGE</div> : <div>HOME PAGE</div>}
+
+      {/* {route ? (
+        <div>GAME PAGE</div>
+      ) : (
+        <HomePage setUser={setUser} setRoute={setRoute} timer={timer} />
+      )} */}
     </div>
   );
 }
@@ -93,6 +136,51 @@ function App() {
 //         )}
 //       </main>
 //     </>
+//   );
+// }
+
+// function App() {
+//   const [wordTest, setWordTest] = useState(["_", "_", "_", "_"]);
+
+//   return (
+//     <main className="flex h-screen flex-col items-center justify-center gap-y-8">
+//       <h1 className="text-4xl font-black">Guess the Word</h1>
+//       {/*
+//       <WordHider word={WORD} letter={inputLetter} />
+//       <div className="text-8xl font-extrabold uppercase tracking-widest">
+//         {wordTest}
+//       </div>
+//       <div className="flex gap-x-2">
+//         <label htmlFor="guess">Guess a letter:</label>
+//         <input
+//           type="text"
+//           className="w-8 border-2 border-gray-300"
+//           maxLength={1}
+//           id="guess"
+//           onInput={(e) => {
+//             const letter = e.target.value;
+//             const splitWord = WORD.split("");
+
+//             if (splitWord.includes(letter)) {
+//               for (let i = 0; i < WORD.length; i++) {
+//                 if (splitWord[i] === letter) {
+//                   console.log(i, "The index");
+//                   setWordTest((prev) => {
+//                     const newValue = [...prev];
+//                     newValue.splice(i, 1, letter);
+//                     console.log(newValue);
+//                     return newValue;
+//                   });
+//                 }
+//               }
+//             }
+
+//             // setInputLetter(() => letter);
+//             e.target.value = "";
+//           }}
+//         />
+//       </div>
+//     </main>
 //   );
 // }
 
